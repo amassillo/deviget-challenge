@@ -40,6 +40,11 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column: 
+                  name: plain_board
+                  type: text
+                  constraints:
+                    nullable: false                    
+              - column: 
                   name: user_id
                   type: integer                                                                                       
               - column:
@@ -49,3 +54,35 @@ databaseChangeLog:
               - column:
                   name: duration
                   type: integer
+        - createTable:
+            tableName: user
+            columns:
+              - column:
+                  name: id
+                  type: int
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false            
+              - column:
+                  name: uname
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: score
+                  type: int    
+  - changeSet:
+      id: 2
+      author: amassillo
+      changes:
+      - addForeignKeyConstraint:
+          baseColumnNames: user_id
+          baseTableName: board
+          constraintName: fk_board_uid
+          deferrable: true
+          initiallyDeferred: true
+          onDelete: CASCADE
+          onUpdate: RESTRICT
+          referencedColumnNames: id
+          referencedTableName: user                                

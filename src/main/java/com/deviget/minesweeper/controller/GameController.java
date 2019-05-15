@@ -1,5 +1,6 @@
 package com.deviget.minesweeper.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.deviget.minesweeper.entity.Board;
+import com.deviget.minesweeper.service.BoardService;
 
 /**
  * 
@@ -18,6 +20,9 @@ import com.deviget.minesweeper.entity.Board;
 @RestController
 @RequestMapping("/game")
 public class GameController {
+	
+	@Autowired
+	private BoardService service;
 
 	@PutMapping (value = "/{boardId}/flag")
 	public ResponseEntity<Board> flagCell(@RequestParam(value="col") Integer pCol, 

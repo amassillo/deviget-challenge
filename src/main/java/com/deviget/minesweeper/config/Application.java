@@ -2,12 +2,18 @@ package com.deviget.minesweeper.config;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 /**
  * 
  * @author amassillo
  *
  */
+@ComponentScan(basePackages = "com.deviget.minesweeper")
+@EnableJpaRepositories(basePackages = "com.deviget.minesweeper.repository")
+@EntityScan(basePackages = "com.deviget.minesweeper.entity")
 @SpringBootApplication
 public class Application {
 
