@@ -1,0 +1,51 @@
+# author: amassillo
+# date: 15-05-19
+databaseChangeLog:
+  - preConditions:
+    - runningAs:
+        username: liquibase
+
+  - changeSet:
+      id: 1
+      author: amassillo
+      changes:
+        - createTable:
+            tableName: board
+            columns:
+              - column:
+                  name: id
+                  type: int
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false            
+              - column:
+                  name: cols
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: rows
+                  type: int
+                  constraints:
+                    nullable: false                    
+              - column: 
+                  name: mines
+                  type: int
+                  constraints:
+                    nullable: false     
+              - column: 
+                  name: status
+                  type: varchar(20)
+                  constraints:
+                    nullable: false
+              - column: 
+                  name: user_id
+                  type: integer                                                                                       
+              - column:
+                  name: start_date
+                  type: datetime
+                  defaultValueComputed : current_timestamp
+              - column:
+                  name: duration
+                  type: integer

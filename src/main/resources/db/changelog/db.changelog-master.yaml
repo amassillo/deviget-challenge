@@ -1,0 +1,5 @@
+# this is the general liquibase file
+
+databaseChangeLog:
+  - include:
+      file: db/changelog/db.changelog-1.0.yaml
