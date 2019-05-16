@@ -3,7 +3,7 @@ spring:
     name: minesweeper-exam-service
     
 spring.datasource:
-  url: jdbc:mysql://${DATABASE_HOST}:${DATABASE_PORT}/minesweeper_db
+  url: jdbc:postgresql://localhost:5432/minesweeper_db
   username: liquibase
-  password: liquibase!us3r
+  password: th3runn1ng!us3r
   driverClassName: org.postgresql.Driver     

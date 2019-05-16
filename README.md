@@ -2,8 +2,9 @@ pre-requisites
 1 - Have postgre installed on your machine (provided a docker file in any other case you want to use an image)
 2 - create a postgre schema called minesweeper_db and a user identified by liquibase, password: th3runn1ng!us3r
 3 - grant privileges to the user ex:
-	
-4 - mvn clean package + mvn springboot run
+	CREATE USER liquibase WITH PASSWORD 'th3runn1ng!us3r';
+	GRANT all privileges ON database minesweeper_db TO liquibase;
+4 - mvn spring-boot:run or package and use docker
 
 additional notes:
 1 - used lombok

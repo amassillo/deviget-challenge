@@ -2,16 +2,16 @@ package com.deviget.minesweeper.entity;
 
 import java.time.LocalDate;
 
-import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
+import com.deviget.minesweeper.entity.converter.CellAttributeConverter;
 import com.deviget.minesweeper.service.Cell;
 
 import lombok.Data;
@@ -26,11 +26,12 @@ import lombok.Data;
 public class Board {
 
 	@Id
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long id;
 	//board settings
-	private int cols;
-	private int rows;
-	private int mines;
+	private Integer cols;
+	private Integer rows;
+	private Integer mines;
 	
 	//board status
 	public enum Status{
@@ -43,15 +44,11 @@ public class Board {
 	@NotNull
 	private Status status;
 	
-	@ManyToOne
-	@JoinColumn(name="user_id")
-	private User user;
+	private Long userId;
 	
 	//store board as plain text (json) in a table column
-	@Transient
+	@Convert(converter = CellAttributeConverter.class)
 	private Cell[][] cells;
-	@Column(name = "plain_board")
-	private String plainBoard;
 	
 	
 	//timing references
@@ -62,8 +59,4 @@ public class Board {
 	private LocalDate startDate;
 	private Long duration;
 	
-	public Cell[][] getCells(){
-		//from plain to array
-		return this.cells;
-	}
 }

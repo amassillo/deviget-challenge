@@ -7,7 +7,7 @@ import com.deviget.minesweeper.entity.Board;
  * @author amassillo
  *
  */
-public interface ClickCellStrategy {
+public interface CellCommand {
 	
-	public Board clickCell(Board pBoard, Integer pCol, Integer pRow);
+	public boolean execute(Board pBoard, Integer pCol, Integer pRow);
 }

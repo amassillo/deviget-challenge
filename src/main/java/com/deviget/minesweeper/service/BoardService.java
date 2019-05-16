@@ -26,6 +26,8 @@ public class BoardService {
 	@Autowired
 	private UserService userService;
 	
+	@Autowired
+	private BoardGenerator boardGenerator;
 	/**
 	 * 
 	 * @param pUserId
@@ -33,6 +35,10 @@ public class BoardService {
 	 */
 	public List<Board> getUserBoards(Long pUserId){
 		return repository.findBoardByUserId(pUserId);
+	}
+	
+	public Board getBoard(Long pBoardId){
+		return repository.getOne(pBoardId);
 	}
 	
 	/**
@@ -44,31 +50,23 @@ public class BoardService {
 	 */
 	public Board startNewGame(Long pUserId, Integer pCols, 
 							 Integer pRows, Integer pNbrOfMines) {
-		Board lBoard = new Board();
-		lBoard.setRows(pRows);
-		lBoard.setCols(pCols);
-		lBoard.setMines(pNbrOfMines);
+		Board lBoard = boardGenerator.generateBoard(pCols, pRows, pNbrOfMines);
 		//tie to user
 		User lUser = userService.getUserById(pUserId);
-		if (lUser!=null)
-			lBoard.setUser(lUser);
-		else
-			throw new EntityNotFoundException(""); //TODO
 		
-		//generate mines location
-		Cell[][] lCells = BoardGenerator.generateBoard(lBoard, pCols, 
-														pRows, pNbrOfMines);
-		//set mined cells
-		lBoard.setCells(lCells);
+		if (lUser!=null)
+			lBoard.setUserId(pUserId);
+		else
+			throw new EntityNotFoundException("User not found"); //TODO
 		//save
-		return this.saveUserBoard(pUserId, lBoard);
+		return this.saveUserBoard(lBoard);
 	}
 	
 	/**
 	 * 
 	 * @param pBoardId
 	 * @param pCol
-	 * @param pRow
+	 * @param pRow	
 	 */
 	public void clickCell(Long pBoardId, Integer pCol, Integer pRow) {
 		Board lBoard = repository.getOne(pBoardId);
@@ -91,7 +89,7 @@ public class BoardService {
 	 * @param pBoard
 	 * @return
 	 */
-	public Board saveUserBoard(Long pUserId, Board pBoard) {
+	public Board saveUserBoard(Board pBoard) {
 		return repository.save(pBoard);
 	}
 	

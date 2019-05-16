@@ -40,13 +40,13 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column: 
-                  name: plain_board
+                  name: cells
                   type: text
                   constraints:
                     nullable: false                    
               - column: 
                   name: user_id
-                  type: integer                                                                                       
+                  type: int                                                                                       
               - column:
                   name: start_date
                   type: datetime

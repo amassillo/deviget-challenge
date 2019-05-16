@@ -1,6 +1,7 @@
 package com.deviget.minesweeper.service;
 
-import com.deviget.minesweeper.entity.Board;
+
+import java.io.Serializable;
 
 import lombok.Data;
 
@@ -11,24 +12,29 @@ import lombok.Data;
  */
 
 @Data
-public class Cell {
+public class Cell implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	public enum CellStatus{
 		CLEAR,
-		BOMB,
+		BOMB	
+	}
+	public enum CellFlag{
+		NUMBER, //not done by user
 		QUESTION_MARK,
-		RED_FLAG
+		FLAG	
 	}
 	private CellStatus status;
 	
-	private String flaggedWith;
-	
-	private Board board;
+	private CellFlag flaggedWith;
 	
 	public Cell() {}
 	
-	public Cell(CellStatus pCellStatus, Board pBoard) {
+	public Cell(CellStatus pCellStatus) {
 		this.setStatus(pCellStatus);
-		this.setBoard(pBoard);
 	}
 }
