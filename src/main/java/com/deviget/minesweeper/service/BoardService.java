@@ -1,5 +1,7 @@
 package com.deviget.minesweeper.service;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.persistence.EntityNotFoundException;
@@ -90,11 +92,13 @@ public class BoardService {
 			if (!hasAnyRemainingActionToPerform(lBoard)) {
 				lBoard.setStatus(Status.FINALIZED);
 				lBoard.setResult(true);
+				this.calculateBoardPlayTime(lBoard);
 			}else if (lBoard.getStatus().equals(Status.NEW))
 						lBoard.setStatus(Status.ON_GOING);
 		}else {
 			lBoard.setStatus(Status.FINALIZED);
 			lBoard.setResult(false);
+			this.calculateBoardPlayTime(lBoard);
 		}
 		//update board status if game has ended (according command result)
 		//save partial result
@@ -148,6 +152,7 @@ public class BoardService {
 		Board lBoard = this.repository.getOne(pBoardId);
 		checkBoardStatus(lBoard); //might throw exception
 		lBoard.setStatus(Status.PAUSED);
+		this.calculateBoardPlayTime(lBoard);
 		return this.saveUserBoard(lBoard);
 	}
 	
@@ -162,6 +167,7 @@ public class BoardService {
 		Board lBoard = this.repository.getOne(pBoardId);
 		if (lBoard.getStatus().equals(Status.FINALIZED))
 			throw new BoardStatusException(lBoard.getStatus(),"");
+		lBoard.setLastDateTimeStarted(LocalDateTime.now());
 		lBoard.setStatus(Status.ON_GOING);
 		return this.saveUserBoard(lBoard);
 	}
@@ -212,5 +218,15 @@ public class BoardService {
 					return true;
 			}
 		return false;
+	}
+	
+	/**
+	 * 
+	 * @param pBoard
+	 */
+	private void calculateBoardPlayTime(Board pBoard) {
+		Duration timeDiff = Duration.between(pBoard.getLastDateTimeStarted() , LocalDateTime.now());
+		timeDiff.plus(pBoard.getDuration());
+		pBoard.setDuration(timeDiff);
 	}
 }

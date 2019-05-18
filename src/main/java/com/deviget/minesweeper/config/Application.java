@@ -31,13 +31,4 @@ public class Application {
 	public BoardGenerator getBoardGenerator() {
 		return new BoardGeneratorImpl();
 	}
-	
-/*
-	@Autowired
-	private CellDTOMapper cellDTOMapper;
-
-	@Bean
-	public CellDTOMapper getCellDTOMapper() {
-		return cellDTOMapper;
-	}*/
 }

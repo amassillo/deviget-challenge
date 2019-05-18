@@ -88,15 +88,27 @@ public class BoardController {
 		return new ResponseEntity<ResponseDTO> (lDTO,HttpStatus.OK);
 	}
 	
-	@PutMapping (value = "/{boardId}")
+	@PostMapping (value = "/{boardId}/resume")
 	public ResponseEntity<ResponseIdsDTO> resumeBoard(@PathVariable(value="boardId") Long pBoardId,
 											 	   @RequestParam(value="userId") Long pUserId){
 		try {
-			//service.resumeGame(pUserId, pBoardId)
+			service.resumeGame(pUserId, pBoardId);
 			return new ResponseEntity<ResponseIdsDTO> (HttpStatus.OK);//TODO
 		}catch (Exception e) {
 			//other unexpected error
 			return new ResponseEntity<ResponseIdsDTO> (HttpStatus.BAD_REQUEST);
 		}
 	}
+	@PostMapping (value = "/{boardId}/pause")
+	public ResponseEntity<ResponseIdsDTO> pauseBoard(@PathVariable(value="boardId") Long pBoardId,
+											 	   @RequestParam(value="userId") Long pUserId){
+		try {
+			service.pauseGame(pUserId, pBoardId);
+			return new ResponseEntity<ResponseIdsDTO> (HttpStatus.OK);//TODO
+		}catch (Exception e) {
+			//other unexpected error
+			return new ResponseEntity<ResponseIdsDTO> (HttpStatus.BAD_REQUEST);
+		}
+	}
+
 }

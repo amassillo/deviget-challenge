@@ -51,12 +51,15 @@ databaseChangeLog:
                   name: user_id
                   type: int                                                                                       
               - column:
-                  name: start_date
+                  name: start_date_time
                   type: datetime
                   defaultValueComputed : current_timestamp
               - column:
+                  name: last_date_time_started
+                  type: datetime
+              - column:
                   name: duration
-                  type: integer
+                  type: varchar(100)
         - createTable:
             tableName: game_user
             columns:

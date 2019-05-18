@@ -1,6 +1,7 @@
 package com.deviget.minesweeper.entity;
 
-import java.time.LocalDate;
+import java.time.Duration;
+import java.time.LocalDateTime;
 
 import javax.persistence.Convert;
 import javax.persistence.Entity;
@@ -10,6 +11,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
+
+import org.hibernate.annotations.Proxy;
 
 import com.deviget.minesweeper.entity.converter.CellAttributeConverter;
 
@@ -22,6 +25,7 @@ import lombok.Data;
  */
 @Entity
 @Data
+@Proxy(lazy = false)
 public class Board {
 
 	@Id
@@ -57,7 +61,9 @@ public class Board {
 	 * if instead of summing up the time spent in a game, 
 	 * it's required to store each time user plays in a board, a new table is required (log table)
 	*/  
-	private LocalDate startDate;
-	private Long duration;
+	private LocalDateTime startDateTime;
+	
+	private LocalDateTime lastDateTimeStarted;
+	private Duration duration;
 	
 }

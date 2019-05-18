@@ -1,14 +1,13 @@
 package com.deviget.minesweeper.service.algo;
 
-import java.time.LocalDate;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 import com.deviget.minesweeper.entity.Board;
 import com.deviget.minesweeper.entity.Cell;
-import com.deviget.minesweeper.entity.Board.Status;
-import com.deviget.minesweeper.entity.Cell.CellFlag;
 
 import lombok.Data;
 
@@ -62,7 +61,10 @@ public class BoardGeneratorImpl implements  BoardGenerator{
 		lBoard.setRows(pRows);
 		lBoard.setCols(pCols);
 		lBoard.setMines(pNbrOfMines);
-		lBoard.setStartDate(LocalDate.now());
+		LocalDateTime lTime = LocalDateTime.now();
+		lBoard.setStartDateTime(lTime);
+		lBoard.setLastDateTimeStarted(lTime);
+		lBoard.setDuration(Duration.ZERO);
 		return lBoard;
 	}
 	/**
