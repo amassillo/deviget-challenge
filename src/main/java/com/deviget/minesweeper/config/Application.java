@@ -10,6 +10,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import com.deviget.minesweeper.service.algo.BoardGenerator;
 import com.deviget.minesweeper.service.algo.BoardGeneratorImpl;
 
+
+
 /**
  * 
  * @author amassillo
@@ -29,4 +31,13 @@ public class Application {
 	public BoardGenerator getBoardGenerator() {
 		return new BoardGeneratorImpl();
 	}
+	
+/*
+	@Autowired
+	private CellDTOMapper cellDTOMapper;
+
+	@Bean
+	public CellDTOMapper getCellDTOMapper() {
+		return cellDTOMapper;
+	}*/
 }

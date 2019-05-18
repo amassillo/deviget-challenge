@@ -1,6 +1,5 @@
 package com.deviget.minesweeper.service.algo;
 
-import com.deviget.minesweeper.entity.Board;
 
 /**
  * 
@@ -9,5 +8,5 @@ import com.deviget.minesweeper.entity.Board;
  */
 public interface CellCommand {
 	
-	public boolean execute(Board pBoard, Integer pCol, Integer pRow);
+	public boolean execute(int pCol, int pRow);
 }

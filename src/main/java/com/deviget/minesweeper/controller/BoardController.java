@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.deviget.minesweeper.controller.dtomapper.BoardDTOMapper;
 import com.deviget.minesweeper.dto.BoardDTO;
+import com.deviget.minesweeper.dto.ResponseIdsDTO;
 import com.deviget.minesweeper.dto.ResponseDTO;
 import com.deviget.minesweeper.entity.Board;
 import com.deviget.minesweeper.service.BoardService;
@@ -34,25 +36,40 @@ public class BoardController {
 	
 	@Autowired
 	private BoardService service;
+	
+	@Autowired
+	private BoardDTOMapper mapper;
 
 	@GetMapping (value = "/")
 	//TODO move to DTO BoardDTO
-	public ResponseEntity<List<Board>> getBoards(@RequestParam(value="user_id") Long pUserId){
+	public ResponseEntity<ResponseDTO> getBoards(@RequestParam(value="user_id") Long pUserId){
 		try {
-			return new ResponseEntity<List<Board>> (service.getUserBoards(pUserId),HttpStatus.OK);
+			List<Long> lIds = service.getUserBoards(pUserId);
+			ResponseIdsDTO lDTO = new ResponseIdsDTO(lIds);
+			return new ResponseEntity<ResponseDTO> (lDTO,HttpStatus.OK);//TODO
 		}catch (Exception e) {
 			//other unexpected error
-			return new ResponseEntity<List<Board>> (HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<ResponseDTO> (HttpStatus.BAD_REQUEST);
 		}
 	}
 	
+	/**
+	 * prints board
+	 * @param pBoardId
+	 * @return
+	 */
 	@GetMapping (value = "/{boardId}")
-	public ResponseEntity<Board> getBoard(@PathVariable(value="boardId") Long pBoardId){
+	public ResponseEntity<ResponseDTO> getBoard(@PathVariable(value="boardId") Long pBoardId){
 		try {
-			return new ResponseEntity<Board> (service.getBoard(pBoardId),HttpStatus.OK);
+			Board lBoard = service.getBoard(pBoardId);
+			if (lBoard !=null) {
+				return new ResponseEntity<ResponseDTO> (mapper.boardToBoardDTOMapper(lBoard),HttpStatus.OK);
+			}else
+				return new ResponseEntity<ResponseDTO> (new ResponseDTO("Board not found"),HttpStatus.BAD_REQUEST);
 		}catch (Exception e) {
 			//other unexpected error
-			return new ResponseEntity<Board> (HttpStatus.BAD_REQUEST);
+			logger.error(e.getMessage());
+			return new ResponseEntity<ResponseDTO> (new ResponseDTO("An unexpected error has occurred"), HttpStatus.BAD_REQUEST);
 		}
 	}
 	
@@ -61,25 +78,25 @@ public class BoardController {
 										 @RequestParam(value="cols", required = true) Integer pCols, 
 										 @RequestParam(value="rows", required = true) Integer pRows,
 										 @RequestParam(value="mines", required = true) Integer pNbrOfMines){
-		ResponseDTO lDTO = null;
 		//some parameters validation
 		if (pNbrOfMines > pRows * pCols) {
-			lDTO = new ResponseDTO("Number of mines should be lower than board's total cells");
-			return new ResponseEntity<ResponseDTO> (lDTO, HttpStatus.OK);
+			ResponseDTO lDTO = new ResponseDTO("Number of mines should be lower than board's total cells");
+			return new ResponseEntity<ResponseDTO> (lDTO,HttpStatus.BAD_REQUEST);//TODO
 		}
 		Board lBoard = service.startNewGame(pUserId, pCols, pRows, pNbrOfMines);
-		BoardDTO lBoardDTO = new BoardDTO();
-		return new ResponseEntity<ResponseDTO> (lBoardDTO, HttpStatus.OK);
+		ResponseIdsDTO lDTO = new ResponseIdsDTO(lBoard.getId());
+		return new ResponseEntity<ResponseDTO> (lDTO,HttpStatus.OK);
 	}
 	
 	@PutMapping (value = "/{boardId}")
-	public ResponseEntity<Board> resumeBoard(@PathVariable(value="boardId") Long pBoardId,
-											 @RequestParam(value="userId") Long pUserId){
+	public ResponseEntity<ResponseIdsDTO> resumeBoard(@PathVariable(value="boardId") Long pBoardId,
+											 	   @RequestParam(value="userId") Long pUserId){
 		try {
-			return new ResponseEntity<Board> (service.resumeBoard(pUserId, pBoardId),HttpStatus.OK);
+			//service.resumeGame(pUserId, pBoardId)
+			return new ResponseEntity<ResponseIdsDTO> (HttpStatus.OK);//TODO
 		}catch (Exception e) {
 			//other unexpected error
-			return new ResponseEntity<Board> (HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<ResponseIdsDTO> (HttpStatus.BAD_REQUEST);
 		}
 	}
 }

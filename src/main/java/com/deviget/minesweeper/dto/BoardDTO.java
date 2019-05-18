@@ -1,5 +1,7 @@
 package com.deviget.minesweeper.dto;
 
+import com.deviget.minesweeper.entity.Board.Status;
+
 import lombok.Data;
 
 /**
@@ -11,9 +13,6 @@ import lombok.Data;
 public class BoardDTO extends ResponseDTO{
 
 	private Long id;
-	//board settings
-	private Integer cols;
-	private Integer rows;
-	private Integer mines;
-	
+	private CellDTO[][] cells;
+	private Status status;
 }

@@ -8,6 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import lombok.Data;
@@ -18,6 +19,7 @@ import lombok.Data;
  *
  */
 @Entity
+@Table(name="game_user")
 @Data
 public class User {
 	@Id
@@ -26,8 +28,8 @@ public class User {
 	@NotNull
 	private String uname;
 	
-	@OneToMany (fetch = FetchType.LAZY)
-	private List<Board> boards;
+	//@OneToMany (fetch = FetchType.LAZY)
+	//private List<Board> boards;
 	
 	private Integer score;
 }

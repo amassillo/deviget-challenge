@@ -12,7 +12,6 @@ import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 
 import com.deviget.minesweeper.entity.converter.CellAttributeConverter;
-import com.deviget.minesweeper.service.Cell;
 
 import lombok.Data;
 
@@ -36,14 +35,16 @@ public class Board {
 	//board status
 	public enum Status{
 		NEW,
-		RESUMED,
-		COMPLETED //meaning user has won
+		ON_GOING,
+		PAUSED,
+		FINALIZED, //meaning game has ended
 	}
 	
 	@Enumerated(EnumType.STRING)
 	@NotNull
 	private Status status;
 	
+	private boolean result; //user won or not (true or false)
 	private Long userId;
 	
 	//store board as plain text (json) in a table column

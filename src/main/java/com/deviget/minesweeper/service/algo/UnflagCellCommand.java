@@ -1,5 +1,7 @@
 package com.deviget.minesweeper.service.algo;
 
+import java.util.EnumSet;
+
 import com.deviget.minesweeper.entity.Board;
 import com.deviget.minesweeper.entity.Cell;
 import com.deviget.minesweeper.entity.Cell.CellFlag;
@@ -9,26 +11,23 @@ import com.deviget.minesweeper.entity.Cell.CellFlag;
  * @author amassillo
  *
  */
-public class FlagCellCommand implements CellCommand {
+public class UnflagCellCommand implements CellCommand {
 	
-	private CellFlag flag ;
 	private Board board ;
 	
-	public FlagCellCommand(Board pBoard, CellFlag pFlag) {
-		this.flag = pFlag;
+	public UnflagCellCommand(Board pBoard) {
 		this.board = pBoard;
 	}
 	
 	public boolean execute(int pCol, int pRow) {
 		Cell lCell = board.getCells()[pCol][pRow];
-		if (lCell == null) {
-			lCell = new Cell();
-			board.getCells()[pCol][pRow] = lCell;
-		}
 		//not able to flag numbered cells
-		if (lCell.getFlag() !=null && lCell.getFlag().equals(CellFlag.NUMBER) && lCell.getFlagValue()>0)
-			return false;
-		lCell.setFlag(flag);
-		return true;
+		EnumSet<CellFlag> lOptions = EnumSet.of(CellFlag.FLAG, CellFlag.QUESTION_MARK);
+		if (lCell !=null && lCell.getFlag() !=null &&
+				lOptions.contains(lCell.getFlag())) {
+				lCell.setFlag(null);
+				return true;
+			}
+		return false;
 	}
 }

@@ -7,7 +7,7 @@ import javax.persistence.AttributeConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.deviget.minesweeper.service.Cell;
+import com.deviget.minesweeper.entity.Cell;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 

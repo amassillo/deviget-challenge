@@ -40,6 +40,9 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column: 
+                  name: result
+                  type: boolean                  
+              - column: 
                   name: cells
                   type: text
                   constraints:
@@ -55,7 +58,7 @@ databaseChangeLog:
                   name: duration
                   type: integer
         - createTable:
-            tableName: user
+            tableName: game_user
             columns:
               - column:
                   name: id
@@ -85,4 +88,4 @@ databaseChangeLog:
           onDelete: CASCADE
           onUpdate: RESTRICT
           referencedColumnNames: id
-          referencedTableName: user                                
+          referencedTableName: game_user                                

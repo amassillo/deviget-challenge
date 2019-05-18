@@ -22,5 +22,10 @@ public class UserService {
 	public User getUserById(Long pUserId){
 		return repository.getOne(pUserId);
 	}
-	
+
+	public Long saveUser(String pUname) {
+		User lUser = new User();
+		lUser.setUname(pUname);
+		return repository.save(lUser).getId();
+	}
 }

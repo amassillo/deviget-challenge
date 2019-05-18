@@ -10,4 +10,24 @@ additional notes:
 1 - used lombok
 2 - used liquibase for db scripts versioning
 3 - used maven to manage dependencies and generate projhect documentation w/ swagger
-4 - used jpa + hibernate since I decided to go w/ postgres	
+4 - used jpa + hibernate since I decided to go w/ postgres
+5 - used mapstruct for entity/DTO mapping	
+
+
+endpoints:
+1 - new game
+
+	POST /board/
+	userId=
+	cols=
+	rows=
+	mines=
+	
+2 - click cell
+	
+	POST /play/{boardId}	
+	col=
+	row=
+	
+3 - flag cell	
+	
