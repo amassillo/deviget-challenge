@@ -1,5 +1,6 @@
 pre-requisites
-1 - Have postgre installed on your machine (provided a docker file in any other case you want to use an image)
+1 - jaba 8+
+	Have postgre installed on your machine (provided a docker file in any other case you want to use an image)
 2 - create a postgre schema called minesweeper_db and a user identified by liquibase, password: {your selected password}
 3 - grant privileges to the user ex:
 	CREATE USER liquibase WITH PASSWORD  {your selected password};

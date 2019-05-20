@@ -39,7 +39,8 @@ public class GameController {
 	public ResponseEntity<ResponseDTO> flagCell(@PathVariable(value="boardId") Long pBoardId,
 										  @RequestParam(value="col", required=true) Integer pCol, 
 										  @RequestParam(value="row", required=true) Integer pRow,
-										  @RequestParam(value="flag", required=true) String pFlag) throws BoardStatusException, IndexOutOfBoardException{
+										  @RequestParam(value="flag", required=true) String pFlag,
+										  @RequestParam(value="user_id") Long pUserId) throws BoardStatusException, IndexOutOfBoardException{
 		ResponseDTO lDTO = null;
 		EnumSet<CellFlag> lOptions = EnumSet.of(CellFlag.FLAG, CellFlag.QUESTION_MARK);
 		CellFlag lFlag = CellFlag.valueOf(pFlag);
@@ -64,7 +65,8 @@ public class GameController {
 	@PostMapping (value = "/{boardId}/click")
 	public ResponseEntity<ResponseDTO> clickCell(@PathVariable(value="boardId", required=true) Long pBoardId,
 										   @RequestParam(value="col", required=true) Integer pCol, 
-										   @RequestParam(value="row", required=true) Integer pRow) throws BoardStatusException, IndexOutOfBoardException{
+										   @RequestParam(value="row", required=true) Integer pRow,
+										   @RequestParam(value="user_id") Long pUserId) throws BoardStatusException, IndexOutOfBoardException{
 		ResponseDTO lDTO = new BoardDTO();
 		boolean lResult = service.clickCell(pBoardId, pCol, pRow);
 		if(!lResult)
