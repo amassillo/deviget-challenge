@@ -3,7 +3,7 @@ package com.deviget.minesweeper.config;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import javax.persistence.EntityNotFoundException;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
@@ -12,11 +12,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.deviget.minesweeper.dto.ResponseDTO;
 import com.deviget.minesweeper.service.exception.BoardStatusException;
 import com.deviget.minesweeper.service.exception.IndexOutOfBoardException;
+import com.deviget.minesweeper.service.exception.RecordNotFoundException;
 
 /**
  * 
@@ -29,22 +29,23 @@ public class GlobalExceptionHandler  {
 	private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 	
 	@ExceptionHandler(SQLException.class)
-	public String handleSQLException(HttpServletRequest request, Exception ex){
+	public ResponseEntity<ResponseDTO> handleSQLException(HttpServletRequest request, Exception ex){
 		logger.info("SQLException Occured:: URL="+request.getRequestURL());
-		return "database_error";
+		return new ResponseEntity<ResponseDTO> (new ResponseDTO("An unexpected error has ocurred, please try again later"),
+												HttpStatus.BAD_REQUEST);
 	}
 	
-	@ResponseStatus(value=HttpStatus.BAD_REQUEST, reason="IOException occured")
 	@ExceptionHandler(IOException.class)
-	public void handleIOException(Exception ex){
+	public ResponseEntity<ResponseDTO> handleIOException(Exception ex){
 		logger.error("IOException handler executed: "+ ex.getMessage());
-		//returning 404 error code
+		return new ResponseEntity<ResponseDTO> (new ResponseDTO("An unexpected error has ocurred, please try again later"),
+				HttpStatus.BAD_REQUEST);
 	}
 	
-	@ExceptionHandler(EntityNotFoundException.class)
-	public ResponseEntity<ResponseDTO> handleEntityNotFoundException(EntityNotFoundException ex){
+	@ExceptionHandler(RecordNotFoundException.class)
+	public ResponseEntity<ResponseDTO> handleEntityNotFoundException(RecordNotFoundException ex){
 		logger.error("Entity not found execption: "+ ex.getMessage());
-		return new ResponseEntity<ResponseDTO> (new ResponseDTO("Record not found"),
+		return new ResponseEntity<ResponseDTO> (new ResponseDTO("Record "+ ex.getId()+" not found"),
 												HttpStatus.BAD_REQUEST);
 	}
 

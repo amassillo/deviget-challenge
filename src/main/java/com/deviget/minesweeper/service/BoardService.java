@@ -7,6 +7,7 @@ import java.util.List;
 import javax.persistence.EntityNotFoundException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.orm.jpa.JpaObjectRetrievalFailureException;
 import org.springframework.stereotype.Service;
 
 import com.deviget.minesweeper.entity.Board;
@@ -21,6 +22,7 @@ import com.deviget.minesweeper.service.algo.FlagCellCommand;
 import com.deviget.minesweeper.service.algo.UnflagCellCommand;
 import com.deviget.minesweeper.service.exception.BoardStatusException;
 import com.deviget.minesweeper.service.exception.IndexOutOfBoardException;
+import com.deviget.minesweeper.service.exception.RecordNotFoundException;
 
 /**
  * 
@@ -47,9 +49,6 @@ public class BoardService {
 		return repository.getBoardIdsbyUserId(pUserId);
 	}
 	
-	public Board getBoard(Long pBoardId){
-		return repository.getOne(pBoardId);
-	}
 	
 	/**
 	 * 
@@ -57,9 +56,10 @@ public class BoardService {
 	 * @param pCols
 	 * @param pRows
 	 * @param pNbrOfMines
+	 * @throws RecordNotFoundException 
 	 */
 	public Board startNewGame(Long pUserId, Integer pCols, 
-							 Integer pRows, Integer pNbrOfMines) {
+							 Integer pRows, Integer pNbrOfMines) throws RecordNotFoundException {
 		Board lBoard = boardGenerator.generateBoard(pCols, pRows, pNbrOfMines);
 		//tie to user
 		User lUser = userService.getUserById(pUserId);
@@ -67,7 +67,7 @@ public class BoardService {
 		if (lUser!=null)
 			lBoard.setUserId(pUserId);
 		else
-			throw new EntityNotFoundException("User not found"); //TODO
+			throw new RecordNotFoundException(pUserId); //TODO
 		lBoard.setStatus(Status.NEW);
 		//save
 		return this.saveUserBoard(lBoard);
@@ -80,10 +80,15 @@ public class BoardService {
 	 * @param pRow	
 	 * @throws BoardStatusException 
 	 * @throws IndexOutOfBoardException 
+	 * @throws RecordNotFoundException 
 	 */
-	public boolean clickCell(Long pBoardId, Integer pCol, Integer pRow) throws BoardStatusException, IndexOutOfBoardException {
-		Board lBoard = repository.getOne(pBoardId);
-		runBoardChecks(lBoard, pRow,pCol); //might throw exception
+	public boolean clickCell(Long pBoardId, Integer pCol, Integer pRow) throws BoardStatusException, IndexOutOfBoardException, RecordNotFoundException {
+		Board lBoard = getBoard(pBoardId);
+		//might throw exception -----------------------------
+		checkBoardExists(pBoardId, lBoard);
+		runBoardChecks(lBoard, pRow,pCol);
+		//end of might throw exception ----------------------
+
 		CellCommand lCommand = new ClickCellCommand(lBoard);
 		//normalize cords
 		boolean lResult = lCommand.execute(pCol-1, pRow-1);
@@ -113,10 +118,14 @@ public class BoardService {
 	 * @param pRow	
 	 * @throws BoardStatusException 
 	 * @throws IndexOutOfBoardException 
+	 * @throws RecordNotFoundException 
 	 */
-	public void flagCell(Long pBoardId, Integer pCol, Integer pRow, Cell.CellFlag pFlag ) throws BoardStatusException, IndexOutOfBoardException {
-		Board lBoard = repository.getOne(pBoardId);
-		runBoardChecks(lBoard, pRow,pCol); //might throw exception
+	public void flagCell(Long pBoardId, Integer pCol, Integer pRow, Cell.CellFlag pFlag ) throws BoardStatusException, IndexOutOfBoardException, RecordNotFoundException {
+		Board lBoard = getBoard(pBoardId);
+		//might throw exception -----------------------------
+		checkBoardExists(pBoardId, lBoard);
+		runBoardChecks(lBoard, pRow,pCol);
+		//end of might throw exception ----------------------
 		CellCommand lCommand = new FlagCellCommand(lBoard,pFlag);
 		//normalize cords
 		if (lCommand.execute(pCol-1, pRow-1))
@@ -130,10 +139,14 @@ public class BoardService {
 	 * @param pRow
 	 * @throws IndexOutOfBoardException 
 	 * @throws BoardStatusException 
+	 * @throws RecordNotFoundException 
 	 */
-	public void unflagCell(Long pBoardId, Integer pCol, Integer pRow) throws BoardStatusException, IndexOutOfBoardException {
-		Board lBoard = repository.getOne(pBoardId);
-		runBoardChecks(lBoard, pRow,pCol); //might throw exception
+	public void unflagCell(Long pBoardId, Integer pCol, Integer pRow) throws BoardStatusException, IndexOutOfBoardException, RecordNotFoundException {
+		Board lBoard = getBoard(pBoardId);
+		//might throw exception -----------------------------
+		checkBoardExists(pBoardId, lBoard);
+		runBoardChecks(lBoard, pRow,pCol);
+		//end of might throw exception ----------------------
 		CellCommand lCommand = new UnflagCellCommand(lBoard);
 		//normalize cords
 		if (lCommand.execute(pCol-1, pRow-1))
@@ -147,9 +160,10 @@ public class BoardService {
 	 * @param pBoardId
 	 * @return
 	 * @throws BoardStatusException 
+	 * @throws RecordNotFoundException 
 	 */
-	public Board pauseGame(Long pUserId, Long pBoardId) throws BoardStatusException {
-		Board lBoard = this.repository.getOne(pBoardId);
+	public Board pauseGame(Long pUserId, Long pBoardId) throws BoardStatusException, RecordNotFoundException {
+		Board lBoard = getBoard(pBoardId);
 		checkBoardStatus(lBoard); //might throw exception
 		lBoard.setStatus(Status.PAUSED);
 		this.calculateBoardPlayTime(lBoard);
@@ -162,9 +176,10 @@ public class BoardService {
 	 * @param pBoardId
 	 * @return
 	 * @throws BoardStatusException 
+	 * @throws RecordNotFoundException 
 	 */
-	public Board resumeGame(Long pUserId, Long pBoardId) throws BoardStatusException {
-		Board lBoard = this.repository.getOne(pBoardId);
+	public Board resumeGame(Long pUserId, Long pBoardId) throws BoardStatusException, RecordNotFoundException {
+		Board lBoard = getBoard(pBoardId);
 		if (lBoard.getStatus().equals(Status.FINALIZED))
 			throw new BoardStatusException(lBoard.getStatus(),"");
 		lBoard.setLastDateTimeStarted(LocalDateTime.now());
@@ -182,6 +197,17 @@ public class BoardService {
 		return repository.save(pBoard);
 	}
 	
+	/**
+	 * 
+	 * @param pProvidedId
+	 * @param pBoard
+	 * @throws RecordNotFoundException
+	 */
+	public void checkBoardExists(Long pProvidedId, Board pBoard) throws RecordNotFoundException {
+		if (pBoard == null)
+			throw new RecordNotFoundException(pProvidedId);
+
+	}
 	/**
 	 * 
 	 * @param pBoard
@@ -228,5 +254,21 @@ public class BoardService {
 		Duration timeDiff = Duration.between(pBoard.getLastDateTimeStarted() , LocalDateTime.now());
 		timeDiff.plus(pBoard.getDuration());
 		pBoard.setDuration(timeDiff);
+	}
+	
+	/**
+	 * 
+	 * @param pBoardId
+	 * @return
+	 * @throws RecordNotFoundException
+	 */
+	public Board getBoard(Long pBoardId) throws RecordNotFoundException {
+		Board lBoard = null;
+		try {
+			lBoard = this.repository.getOne(pBoardId);
+		}catch(JpaObjectRetrievalFailureException ex) {
+			throw new RecordNotFoundException(pBoardId);
+		}
+		return lBoard;
 	}
 }

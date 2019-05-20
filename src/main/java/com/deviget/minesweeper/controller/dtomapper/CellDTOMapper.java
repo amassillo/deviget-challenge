@@ -6,6 +6,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
+
 import com.deviget.minesweeper.dto.CellDTO;
 import com.deviget.minesweeper.entity.Cell;
 
@@ -48,7 +49,7 @@ public interface CellDTOMapper {
 			 	}
 		 	}
 	 }
-	@Mapping(target = "value", ignore = true ) // This is now mapped in beforeMapping
+	@Mapping(target = "value", ignore = true) // This is now mapped in beforeMapping
 	public CellDTO cellToCellDTOMapper(Cell pCell);
 	public CellDTO[] cellToCellDTOMapper(Cell[] pCell);
 }

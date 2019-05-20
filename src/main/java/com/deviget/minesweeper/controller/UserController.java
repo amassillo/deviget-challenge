@@ -15,6 +15,8 @@ import com.deviget.minesweeper.dto.ResponseIdsDTO;
 import com.deviget.minesweeper.service.UserService;
 
 /**
+ * UserController
+ * Creates users
  * 
  * @author amassillo
  *

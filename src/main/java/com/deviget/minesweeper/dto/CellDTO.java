@@ -12,4 +12,7 @@ import lombok.Data;
 public class CellDTO {
 
 	private String value;
+	
+	public CellDTO() {}
+	public CellDTO(String pValue) {this.value = pValue;}
 }
