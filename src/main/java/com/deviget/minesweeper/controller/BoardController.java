@@ -20,6 +20,7 @@ import com.deviget.minesweeper.dto.ResponseIdsDTO;
 import com.deviget.minesweeper.dto.ResponseDTO;
 import com.deviget.minesweeper.entity.Board;
 import com.deviget.minesweeper.service.BoardService;
+import com.deviget.minesweeper.service.exception.NotYourBoardException;
 import com.deviget.minesweeper.service.exception.RecordNotFoundException;
 
 /**
@@ -58,10 +59,13 @@ public class BoardController {
 	 * @param pBoardId
 	 * @return
 	 * @throws RecordNotFoundException 
+	 * @throws NotYourBoardException 
 	 */
 	@GetMapping (value = "/{boardId}")
-	public ResponseEntity<ResponseDTO> getBoard(@PathVariable(value="boardId") Long pBoardId) throws RecordNotFoundException{
+	public ResponseEntity<ResponseDTO> getBoard(@PathVariable(value="boardId") Long pBoardId,
+												@RequestParam(value="userId", required = false) Long pUserId) throws RecordNotFoundException, NotYourBoardException{
 		Board lBoard = service.getBoard(pBoardId);
+		service.checkBoarOwnership(pUserId,lBoard);
 		return new ResponseEntity<ResponseDTO> (mapper.boardToBoardDTOMapper(lBoard),HttpStatus.OK);
 	}
 	

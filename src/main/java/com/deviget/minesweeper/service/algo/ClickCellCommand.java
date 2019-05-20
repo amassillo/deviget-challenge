@@ -31,11 +31,10 @@ public class ClickCellCommand implements CellCommand {
 			return true;
 		//if no bomb, try to mark as clicked
 		if(!lCell.isHasBomb()){
-			lCell.setClicked(true);
 			//can't click a flagged cell
 			EnumSet<CellFlag> lOptions = EnumSet.of(CellFlag.FLAG, CellFlag.QUESTION_MARK);
 			if (lCell.getFlag()!=null && lOptions.contains(lCell.getFlag()))
-				return true;
+				return false;
 			//check siblings
 			int pFromCol = pCol > 0 ? pCol -1 : pCol;
 			int pToCol = pCol < this.lBoard.getCols() -1 ? pCol + 1 : pCol;
@@ -43,6 +42,10 @@ public class ClickCellCommand implements CellCommand {
 			int pFromRow = pRow > 0 ? pRow -1 : pRow;
 			int pToRow = pRow < this.lBoard.getRows() -1 ? pRow + 1 : pRow;
 			
+			lCell.setClicked(true);
+			//reveal only if no mines nearby
+			if (lCell.getFlagValue() > 0)
+				return true;
 			for (int i = pFromRow; i<= pToRow; i++)
 				for (int j = pFromCol; j<= pToCol; j++) {
 					if (pRow ==i && pCol == j) { ///it's me
@@ -51,17 +54,16 @@ public class ClickCellCommand implements CellCommand {
 					Cell lSibling = lCells[i][j];
 					if (lSibling == null) {
 						lSibling = new Cell();
+						lCells[i][j] = lSibling;
 					}
-					if (lSibling.isHasBomb())
+					if (lSibling.isHasBomb() || lSibling.isClicked())
 						continue; // not propagate
-					if (lSibling.getFlag().equals(CellFlag.NUMBER) && lSibling.getFlagValue() == 0) {
-						lSibling.setClicked(true);
-					}
-					lCells[i][j] = lSibling;
+					lSibling.setClicked(true);
 					//continue checking
 					execute (j,i);
 				}
-
+			//clean up FLAGS if any
+			lCells[pRow][pCol].setFlag(null);
 			return true;
 		}
 		//bomb!

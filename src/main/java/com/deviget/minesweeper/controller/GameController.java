@@ -10,12 +10,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.deviget.minesweeper.controller.dtomapper.BoardDTOMapper;
 import com.deviget.minesweeper.dto.BoardDTO;
 import com.deviget.minesweeper.dto.ResponseDTO;
 import com.deviget.minesweeper.entity.Cell.CellFlag;
 import com.deviget.minesweeper.service.BoardService;
 import com.deviget.minesweeper.service.exception.BoardStatusException;
 import com.deviget.minesweeper.service.exception.IndexOutOfBoardException;
+import com.deviget.minesweeper.service.exception.NotYourBoardException;
 import com.deviget.minesweeper.service.exception.RecordNotFoundException;
 
 /**
@@ -32,18 +34,21 @@ public class GameController {
 
 	@Autowired
 	private BoardService service;
+	
+	@Autowired
+	private BoardDTOMapper mapper;
 
 	@PostMapping (value = "/{boardId}/flag")
 	public ResponseEntity<ResponseDTO> flagCell(@PathVariable(value="boardId") Long pBoardId,
-										  @RequestParam(value="col", required=true) Integer pCol, 
-										  @RequestParam(value="row", required=true) Integer pRow,
-										  @RequestParam(value="flag", required=true) String pFlag,
-										  @RequestParam(value="user_id", required=false) Long pUserId) throws BoardStatusException, IndexOutOfBoardException, RecordNotFoundException{
+										  @RequestParam(value="col") Integer pCol, 
+										  @RequestParam(value="row") Integer pRow,
+										  @RequestParam(value="flag") String pFlag,
+										  @RequestParam(value="userId", required=false) Long pUserId) throws BoardStatusException, IndexOutOfBoardException, RecordNotFoundException, NotYourBoardException{
 		ResponseDTO lDTO = null;
 		EnumSet<CellFlag> lOptions = EnumSet.of(CellFlag.FLAG, CellFlag.QUESTION_MARK);
 		CellFlag lFlag = CellFlag.valueOf(pFlag);
 		if (lOptions.contains(lFlag)) {
-				service.flagCell(pBoardId, pCol, pRow, lFlag);
+				service.flagCell(pBoardId, pCol, pRow, lFlag, pUserId);
 				return new ResponseEntity<ResponseDTO> (new ResponseDTO("Cell has been flagged"),HttpStatus.OK);
 		}else {
 			lDTO = new ResponseDTO("Unknown flag type specified for the cell");
@@ -53,26 +58,24 @@ public class GameController {
 	
 	@PostMapping (value = "/{boardId}/unflag")
 	public ResponseEntity<ResponseDTO> unflagCell(@PathVariable(value="boardId") Long pBoardId,
-										  @RequestParam(value="col", required=true) Integer pCol, 
-										  @RequestParam(value="row", required=true) Integer pRow,
-										  @RequestParam(value="user_id") Long pUserId) throws BoardStatusException, IndexOutOfBoardException, RecordNotFoundException{
-		ResponseDTO lDTO = null;
-		service.unflagCell(pBoardId, pCol, pRow);
-		return new ResponseEntity<ResponseDTO> (new ResponseDTO("Cell has been unflagged"),HttpStatus.OK);
+										  @RequestParam(value="col") Integer pCol, 
+										  @RequestParam(value="row") Integer pRow,
+										  @RequestParam(value="userId", required=false) Long pUserId) throws BoardStatusException, IndexOutOfBoardException, RecordNotFoundException, NotYourBoardException{
+		ResponseDTO lDTO = new ResponseDTO(service.unflagCell(pBoardId, pCol, pRow, pUserId) ? "Cell has been unflagged":"Can't unflag this cell");
+		return new ResponseEntity<ResponseDTO> (lDTO,HttpStatus.OK);
 	}
 	
 	@PostMapping (value = "/{boardId}/click")
-	public ResponseEntity<ResponseDTO> clickCell(@PathVariable(value="boardId", required=true) Long pBoardId,
-										   @RequestParam(value="col", required=true) Integer pCol, 
-										   @RequestParam(value="row", required=true) Integer pRow,
-										   @RequestParam(value="user_id") Long pUserId) throws BoardStatusException, IndexOutOfBoardException, RecordNotFoundException{
-		ResponseDTO lDTO = new BoardDTO();
-		boolean lResult = service.clickCell(pBoardId, pCol, pRow);
+	public ResponseEntity<ResponseDTO> clickCell(@PathVariable(value="boardId") Long pBoardId,
+										   @RequestParam(value="col") Integer pCol, 
+										   @RequestParam(value="row") Integer pRow,
+										   @RequestParam(value="userId", required=false) Long pUserId) throws BoardStatusException, IndexOutOfBoardException, RecordNotFoundException, NotYourBoardException{
+		boolean lResult = service.clickCell(pBoardId, pCol, pRow, pUserId);
+		BoardDTO lDTO   = mapper.boardToBoardDTOMapper(service.getBoard(pBoardId));
 		if(!lResult)
 			lDTO.setMessages("Game's Over");
 		else 
 			lDTO.setMessages("Keep going, here's your board");
-		//TODO
 		return new ResponseEntity<ResponseDTO> (lDTO,HttpStatus.OK);
 	}
 }

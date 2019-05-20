@@ -4,7 +4,6 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import javax.persistence.EntityNotFoundException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.jpa.JpaObjectRetrievalFailureException;
@@ -15,13 +14,11 @@ import com.deviget.minesweeper.entity.Cell;
 import com.deviget.minesweeper.entity.Board.Status;
 import com.deviget.minesweeper.entity.User;
 import com.deviget.minesweeper.repository.BoardRepository;
+import com.deviget.minesweeper.service.algo.BoardActions;
 import com.deviget.minesweeper.service.algo.BoardGenerator;
-import com.deviget.minesweeper.service.algo.CellCommand;
-import com.deviget.minesweeper.service.algo.ClickCellCommand;
-import com.deviget.minesweeper.service.algo.FlagCellCommand;
-import com.deviget.minesweeper.service.algo.UnflagCellCommand;
 import com.deviget.minesweeper.service.exception.BoardStatusException;
 import com.deviget.minesweeper.service.exception.IndexOutOfBoardException;
+import com.deviget.minesweeper.service.exception.NotYourBoardException;
 import com.deviget.minesweeper.service.exception.RecordNotFoundException;
 
 /**
@@ -40,6 +37,9 @@ public class BoardService {
 	
 	@Autowired
 	private BoardGenerator boardGenerator;
+	
+	@Autowired
+	private BoardActions commandRecorder;
 	/**
 	 * 
 	 * @param pUserId
@@ -81,18 +81,18 @@ public class BoardService {
 	 * @throws BoardStatusException 
 	 * @throws IndexOutOfBoardException 
 	 * @throws RecordNotFoundException 
+	 * @throws NotYourBoardException 
 	 */
-	public boolean clickCell(Long pBoardId, Integer pCol, Integer pRow) throws BoardStatusException, IndexOutOfBoardException, RecordNotFoundException {
+	public boolean clickCell(Long pBoardId, Integer pCol, Integer pRow, Long pUserId) throws BoardStatusException, IndexOutOfBoardException, RecordNotFoundException, NotYourBoardException {
 		Board lBoard = getBoard(pBoardId);
 		//might throw exception -----------------------------
 		checkBoardExists(pBoardId, lBoard);
 		runBoardChecks(lBoard, pRow,pCol);
+		checkBoarOwnership(pUserId,lBoard);
 		//end of might throw exception ----------------------
-
-		CellCommand lCommand = new ClickCellCommand(lBoard);
-		//normalize cords
-		boolean lResult = lCommand.execute(pCol-1, pRow-1);
+		boolean lResult = this.commandRecorder.click (lBoard, pCol, pRow);
 		//if board is new, then set status = ONGOING
+		//update board status if game has ended (according command result)
 		if (lResult) {
 			if (!hasAnyRemainingActionToPerform(lBoard)) {
 				lBoard.setStatus(Status.FINALIZED);
@@ -105,7 +105,6 @@ public class BoardService {
 			lBoard.setResult(false);
 			this.calculateBoardPlayTime(lBoard);
 		}
-		//update board status if game has ended (according command result)
 		//save partial result
 		this.saveUserBoard(lBoard);
 		return lResult;
@@ -119,17 +118,22 @@ public class BoardService {
 	 * @throws BoardStatusException 
 	 * @throws IndexOutOfBoardException 
 	 * @throws RecordNotFoundException 
+	 * @throws NotYourBoardException 
 	 */
-	public void flagCell(Long pBoardId, Integer pCol, Integer pRow, Cell.CellFlag pFlag ) throws BoardStatusException, IndexOutOfBoardException, RecordNotFoundException {
+	public boolean flagCell(Long pBoardId, Integer pCol, Integer pRow, Cell.CellFlag pFlag, Long pUserId ) throws BoardStatusException, IndexOutOfBoardException, RecordNotFoundException, NotYourBoardException {
 		Board lBoard = getBoard(pBoardId);
 		//might throw exception -----------------------------
 		checkBoardExists(pBoardId, lBoard);
 		runBoardChecks(lBoard, pRow,pCol);
+		checkBoarOwnership(pUserId,lBoard);
 		//end of might throw exception ----------------------
-		CellCommand lCommand = new FlagCellCommand(lBoard,pFlag);
-		//normalize cords
-		if (lCommand.execute(pCol-1, pRow-1))
+		boolean lResult = this.commandRecorder.flag(lBoard,pFlag, pCol, pRow);
+		//normalize cords 
+		if (lResult) {
 			this.saveUserBoard(lBoard);//save partial result
+			return true;
+		}
+		return false;
 	}
 	
 	/**
@@ -140,17 +144,21 @@ public class BoardService {
 	 * @throws IndexOutOfBoardException 
 	 * @throws BoardStatusException 
 	 * @throws RecordNotFoundException 
+	 * @throws NotYourBoardException 
 	 */
-	public void unflagCell(Long pBoardId, Integer pCol, Integer pRow) throws BoardStatusException, IndexOutOfBoardException, RecordNotFoundException {
+	public boolean unflagCell(Long pBoardId, Integer pCol, Integer pRow, Long pUserId) throws BoardStatusException, IndexOutOfBoardException, RecordNotFoundException, NotYourBoardException {
 		Board lBoard = getBoard(pBoardId);
 		//might throw exception -----------------------------
 		checkBoardExists(pBoardId, lBoard);
 		runBoardChecks(lBoard, pRow,pCol);
+		checkBoarOwnership(pUserId,lBoard);
 		//end of might throw exception ----------------------
-		CellCommand lCommand = new UnflagCellCommand(lBoard);
+		Boolean lResult = this.commandRecorder.unflag(lBoard, pCol, pRow);
 		//normalize cords
-		if (lCommand.execute(pCol-1, pRow-1))
+		if (lResult) {
 			this.saveUserBoard(lBoard);//save partial result
+			return true;
+		}return false;
 		//
 	}
 	
@@ -161,10 +169,14 @@ public class BoardService {
 	 * @return
 	 * @throws BoardStatusException 
 	 * @throws RecordNotFoundException 
+	 * @throws NotYourBoardException 
 	 */
-	public Board pauseGame(Long pUserId, Long pBoardId) throws BoardStatusException, RecordNotFoundException {
+	public Board pauseGame(Long pUserId, Long pBoardId) throws BoardStatusException, RecordNotFoundException, NotYourBoardException {
 		Board lBoard = getBoard(pBoardId);
-		checkBoardStatus(lBoard); //might throw exception
+		 //might throw exception ----------------------
+		checkBoarOwnership(pUserId,lBoard);
+		checkBoardStatus(lBoard);
+		 //end of might throw exception----------------
 		lBoard.setStatus(Status.PAUSED);
 		this.calculateBoardPlayTime(lBoard);
 		return this.saveUserBoard(lBoard);
@@ -177,11 +189,15 @@ public class BoardService {
 	 * @return
 	 * @throws BoardStatusException 
 	 * @throws RecordNotFoundException 
+	 * @throws NotYourBoardException 
 	 */
-	public Board resumeGame(Long pUserId, Long pBoardId) throws BoardStatusException, RecordNotFoundException {
+	public Board resumeGame(Long pUserId, Long pBoardId) throws BoardStatusException, RecordNotFoundException, NotYourBoardException {
 		Board lBoard = getBoard(pBoardId);
+		 //might throw exception ----------------------
+		checkBoarOwnership(pUserId,lBoard);
 		if (lBoard.getStatus().equals(Status.FINALIZED))
 			throw new BoardStatusException(lBoard.getStatus(),"");
+		 //end of might throw exception --------------
 		lBoard.setLastDateTimeStarted(LocalDateTime.now());
 		lBoard.setStatus(Status.ON_GOING);
 		return this.saveUserBoard(lBoard);
@@ -199,6 +215,17 @@ public class BoardService {
 	
 	/**
 	 * 
+	 * @param pUserId
+	 * @param pBoard
+	 * @throws NotYourBoardException
+	 */
+	public void checkBoarOwnership(Long pUserId, Board pBoard) throws NotYourBoardException {
+		if (pBoard.getUserId() !=null && pUserId != pBoard.getUserId())
+			throw new NotYourBoardException();
+	}
+	
+	/**
+	 * 
 	 * @param pProvidedId
 	 * @param pBoard
 	 * @throws RecordNotFoundException
@@ -206,7 +233,6 @@ public class BoardService {
 	public void checkBoardExists(Long pProvidedId, Board pBoard) throws RecordNotFoundException {
 		if (pBoard == null)
 			throw new RecordNotFoundException(pProvidedId);
-
 	}
 	/**
 	 * 

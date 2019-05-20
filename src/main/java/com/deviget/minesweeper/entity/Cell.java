@@ -3,7 +3,6 @@ package com.deviget.minesweeper.entity;
 
 import java.io.Serializable;
 
-import com.deviget.minesweeper.entity.Cell.CellFlag;
 
 import lombok.Data;
 
@@ -22,7 +21,6 @@ public class Cell implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	public enum CellFlag{
-		NUMBER, //not done by user
 		QUESTION_MARK,
 		FLAG
 	}
@@ -38,7 +36,7 @@ public class Cell implements Serializable {
 	 */
 	public Cell() {
 		//not clicked and no bombs around
-		this(false, CellFlag.NUMBER,0);
+		this(false,null,0);
 	}
 	
 	public Cell(Boolean pCellStatus) {

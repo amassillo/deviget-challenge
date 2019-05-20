@@ -25,8 +25,8 @@ public class FlagCellCommand implements CellCommand {
 			lCell = new Cell();
 			board.getCells()[pCol][pRow] = lCell;
 		}
-		//not able to flag numbered cells
-		if (lCell.getFlag() !=null && lCell.getFlag().equals(CellFlag.NUMBER) && lCell.getFlagValue()>0)
+		//not able to flag clicks that have been clicked
+		if (lCell.isClicked())
 			return false;
 		lCell.setFlag(flag);
 		return true;

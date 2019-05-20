@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import com.deviget.minesweeper.dto.ResponseDTO;
 import com.deviget.minesweeper.service.exception.BoardStatusException;
 import com.deviget.minesweeper.service.exception.IndexOutOfBoardException;
+import com.deviget.minesweeper.service.exception.NotYourBoardException;
 import com.deviget.minesweeper.service.exception.RecordNotFoundException;
 
 /**
@@ -52,7 +53,7 @@ public class GlobalExceptionHandler  {
 	@ExceptionHandler(BoardStatusException.class)
 	public ResponseEntity<ResponseDTO> handleBoardStatusException(BoardStatusException ex){
 		logger.error("Not able to update board status: "+ ex.getMessage());
-		return new ResponseEntity<ResponseDTO> (new ResponseDTO("Can't flag a cell of this board, game has ended"),
+		return new ResponseEntity<ResponseDTO> (new ResponseDTO("Can't use this board, game has ended"),
 												HttpStatus.BAD_REQUEST);
 	}
 	
@@ -60,6 +61,13 @@ public class GlobalExceptionHandler  {
 	public ResponseEntity<ResponseDTO> handleIndexOutOfBoardException(IndexOutOfBoardException ex){
 		logger.error("Not able to update board status: "+ ex.getMessage());
 		return new ResponseEntity<ResponseDTO> (new ResponseDTO("Please provide valid indexes"),
+												HttpStatus.BAD_REQUEST);
+	}
+	
+	@ExceptionHandler(NotYourBoardException.class)
+	public ResponseEntity<ResponseDTO> handleINotYourBoardException(NotYourBoardException ex){
+		logger.error("Attempt to use somebody's else board: "+ ex.getMessage());
+		return new ResponseEntity<ResponseDTO> (new ResponseDTO("Board not found"),
 												HttpStatus.BAD_REQUEST);
 	}
 }

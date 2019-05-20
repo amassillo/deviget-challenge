@@ -26,8 +26,15 @@ public interface CellDTOMapper {
 		 		//to print bombs
 			 	if(source.isHasBomb()) {
 			 		target.setValue("*");
-			 	}else
-			 		target.setValue("-");
+			 	}else if (source.isClicked()) {
+				 		if(source.getFlagValue() >0)
+				 			target.setValue(source.getFlagValue().toString());
+				 		else
+				 			target.setValue("");
+	 					}else {
+	 						target.setValue("-");
+	 					}
+			 	//overwrite if cell has a flag
 			 	if (source.getFlag() !=null)
 			 	switch (source.getFlag()) {
 			 		case FLAG:{
@@ -38,13 +45,8 @@ public interface CellDTOMapper {
 			 			target.setValue("?");
 			 			break;
 			 		}
-			 		case NUMBER:{
-			 			if (source.isClicked()) {
-			 				target.setValue(source.getFlagValue().toString());
-			 				break;
-			 			}
-			 		}
 			 		default:{
+			 			
 			 		}
 			 	}
 		 	}
