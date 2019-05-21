@@ -36,6 +36,7 @@ endpoints (see swagger documentation):
 	POST /play/{boardId}	
 	col=
 	row=
+	userId=
 	
 3 - flag cell
 	
@@ -43,8 +44,9 @@ endpoints (see swagger documentation):
 	col=
 	row=
 	flag= of of these two (QUESTION_MARK, FLAG)
+	userId=
 
 4- get board (prints board)
 	
 	GET /board/{boardId}/	
-		
+	userId=	
