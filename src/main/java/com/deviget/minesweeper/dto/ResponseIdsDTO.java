@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * 
@@ -11,15 +12,16 @@ import lombok.Data;
  *
  */
 @Data
+@EqualsAndHashCode(callSuper=false)
 public class ResponseIdsDTO extends ResponseDTO{
 
-	private List<Long> boardIds;
+	private List<Long> ids;
 	
 	public ResponseIdsDTO() {}
 	public ResponseIdsDTO(Long... pIds) {
-		this.boardIds = Arrays.asList(pIds);
+		this.ids = Arrays.asList(pIds);
 	}
 	public ResponseIdsDTO(List<Long> pIds) {
-		this.boardIds = pIds;
+		this.ids = pIds;
 	}
 }

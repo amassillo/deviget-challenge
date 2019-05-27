@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import com.deviget.minesweeper.entity.Board.Status;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * 
@@ -13,6 +14,7 @@ import lombok.Data;
  *
  */
 @Data
+@EqualsAndHashCode(callSuper=false)
 public class BoardDTO extends ResponseDTO{
 
 	private Long id;

@@ -5,10 +5,10 @@ spring:
 spring.datasource:
   url: jdbc:postgresql://localhost:5432/minesweeper_db
   username: liquibase
-  password: 
+  password: th3runn1ng!us3r
   driverClassName: org.postgresql.Driver     
   
 spring.jpa.properties.hibernate.temp:
   use_jdbc_metadata_defaults: false
 
-server.port : 80  
+server.port : 8080 

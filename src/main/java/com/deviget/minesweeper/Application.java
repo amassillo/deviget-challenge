@@ -1,4 +1,4 @@
-package com.deviget.minesweeper.config;
+package com.deviget.minesweeper;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -17,9 +17,10 @@ import com.deviget.minesweeper.service.algo.BoardGeneratorImpl;
  * @author amassillo
  *
  */
+/*
 @ComponentScan(basePackages = "com.deviget.minesweeper")
 @EnableJpaRepositories(basePackages = "com.deviget.minesweeper.repository")
-@EntityScan(basePackages = "com.deviget.minesweeper.entity")
+@EntityScan(basePackages = "com.deviget.minesweeper.entity")*/
 @SpringBootApplication
 public class Application {
 

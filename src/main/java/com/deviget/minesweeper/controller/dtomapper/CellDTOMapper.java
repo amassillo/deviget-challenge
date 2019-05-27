@@ -20,7 +20,7 @@ public interface CellDTOMapper {
 
 	 @BeforeMapping
 	 default void beforeMapping(@MappingTarget CellDTO target, Cell source) {
-		 	if (source == null || target == null)
+		 	if (source == null)
 		 		target.setValue("-");
 		 	else {
 		 		//to print bombs

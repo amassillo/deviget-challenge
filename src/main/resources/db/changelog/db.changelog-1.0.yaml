@@ -1,10 +1,6 @@
 # author: amassillo
 # date: 15-05-19
 databaseChangeLog:
-  - preConditions:
-    - runningAs:
-        username: liquibase
-
   - changeSet:
       id: 1
       author: amassillo
@@ -86,8 +82,6 @@ databaseChangeLog:
           baseColumnNames: user_id
           baseTableName: board
           constraintName: fk_board_uid
-          deferrable: true
-          initiallyDeferred: true
           onDelete: CASCADE
           onUpdate: RESTRICT
           referencedColumnNames: id
