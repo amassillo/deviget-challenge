@@ -15,12 +15,19 @@ pre-requisites
 additional notes:
 
 1 - used lombok
+
 2 - used liquibase for db scripts versioning
+
 3 - used maven to manage dependencies and generate project documentation w/ swagger
+
 4 - used jpa + hibernate since I decided to go w/ postgre
+
 5 - used mapstruct for entity/DTO mapping	
+
 6 - used factory pattern to generate board
+
 7 - use command pattern to handle click interactions
+
 8 - did not add auth, just sent user_id in the service which checks board belongs to the user. 
 	auth can be added and user_id can be obtained from the auth token in the request's header
 
