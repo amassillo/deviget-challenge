@@ -1,11 +1,14 @@
 pre-requisites
 
-1 - java 8+
-	Have postgre installed on your machine (provided a docker file in any other case you want to use an image)
+1 - java 8+ Have postgre installed on your machine (provided a docker file in any other case you want to use an image)
+
 2 - create a postgre schema called minesweeper_db and a user identified by liquibase, password: {your selected password}
+
 3 - grant privileges to the user ex:
+
 	CREATE USER liquibase WITH PASSWORD  {your selected password};
 	GRANT all privileges ON database minesweeper_db TO liquibase;
+	
 4 - mvn clean package (to generate mapstruct classes)
 	mvn spring-boot:run or  use docker w/ packaged jar
 
